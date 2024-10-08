@@ -1,8 +1,7 @@
-from flask import Flask, render_template, request, url_for
+from flask import Blueprint, render_template, request
 from stravalib import Client
 
-# create flask application
-app = Flask(__name__)
+auth = Blueprint('auth', __name__)
 
 # setup necessary variables
 client_id, client_secret = open("client_secrets.txt").read().strip().split(",")
@@ -10,7 +9,7 @@ request_scope = ["read_all", "profile:read_all", "activity:read_all"]
 redirect_url = "http://127.0.0.1:5000/strava-oauth" # this is redirect url
 
 # setup routes
-@app.route("/")
+@auth.route("/")
 def login():
     client = Client()
     # creates auth url 
@@ -22,7 +21,7 @@ def login():
     )
     return render_template('login.html', authorize_url = url)
 
-@app.route("/strava-oauth")
+@auth.route("/strava-oauth")
 def logged_in():
     code = request.args.get("code")
     client = Client()
@@ -41,6 +40,3 @@ def logged_in():
         athlete=strava_athlete,
         access_token=access_token,
     )
-
-if __name__ == "__main__":
-    app.run(debug=True)
