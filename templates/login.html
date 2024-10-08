@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+<!-- 'form' is used when we want user input; usually followed by input labels etc... -->
+<div class="jumbotron">
+    <h1>Login using Strava</h1>
+    <p class="lead">
+    	Authenticate using your Strava account.
+	</p>
+	<p><a class="btn btn-lg" href="{{ authorize_url }}" role="button"><img src="/static/ConnectWithStrava.png" border="0" width="262" height="43" /></a></p>
+</div>
+{% endblock %}
