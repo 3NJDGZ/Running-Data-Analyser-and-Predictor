@@ -32,10 +32,13 @@ def logged_in():
         code=code
     )
 
+    # activity = client.get_activity(0)
+
     # gets the athlete
     activities = client.get_activities()
     for activity in activities:
-        print(f"\nDistance (m): {activity.distance}")
+        print(f"\nActivity ID: {activity.id}")
+        print(f"Distance (m): {activity.distance}")
         print(f"Max Speed (m/s): {activity.max_speed}")
         print(f"Elapsed Time (s): {activity.elapsed_time}")
     strava_athlete = client.get_athlete()
