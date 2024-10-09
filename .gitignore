@@ -1,2 +1,5 @@
-# ignore important secret files
+# ignore important secret files/folders
 client_secrets.txt
+__pycache__/
+*.pyc 
+*.pyo
