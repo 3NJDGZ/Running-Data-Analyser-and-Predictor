@@ -33,6 +33,11 @@ def logged_in():
     )
 
     # gets the athlete
+    activities = client.get_activities()
+    for activity in activities:
+        print(f"\nDistance (m): {activity.distance}")
+        print(f"Max Speed (m/s): {activity.max_speed}")
+        print(f"Elapsed Time (s): {activity.elapsed_time}")
     strava_athlete = client.get_athlete()
 
     return render_template(
