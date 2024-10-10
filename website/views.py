@@ -1,9 +1,11 @@
-from flask import Blueprint, render_template, request
-from stravalib import Client
+from flask import render_template
+from website.baseView import baseView
 
-views = Blueprint('views', __name__)
+class viewRoutes(baseView):
+    def __init__(self, flaskApp):
+        super().__init__(flaskApp)
 
-# setup routes
-@views.route("/home")
-def home():
-    return render_template('home.html')
+    def _setupRoutes(self):
+        @self._flaskApp.route("/home")
+        def home():
+            return render_template('home.html')
