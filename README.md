@@ -10,3 +10,4 @@
 - https://stravalib.readthedocs.io/en/latest/index.html
 - https://www.w3schools.com/bootstrap5/
 - https://developers.strava.com/docs/reference/ 
+- https://dev.to/nandamtejas/implementing-flask-application-using-object-oriented-programming-oops-5cb
