@@ -1,3 +1,4 @@
 # ignore important secret files/folders
 client_secrets.txt
-website/__pycache__/*
+/__pycache__/*
+venv/

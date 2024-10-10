@@ -36,11 +36,18 @@ def logged_in():
 
     # gets the athlete
     activities = client.get_activities()
+    activity_ids = [] # get the unique ids of each activity so we can get the 'detailed' activities object via the 'get_activity()' function
     for activity in activities:
-        print(f"\nActivity ID: {activity.id}")
-        print(f"Distance (m): {activity.distance}")
-        print(f"Max Speed (m/s): {activity.max_speed}")
-        print(f"Elapsed Time (s): {activity.elapsed_time}")
+        activity_ids.append(activity.id)
+        # print(f"\nActivity ID: {activity.id}")
+        # print(f"Distance (m): {activity.distance}")
+        # print(f"Max Speed (m/s): {activity.max_speed}")
+        # print(f"Elapsed Time (s): {activity.elapsed_time}")
+
+    for x in range(len(activity_ids)):
+        avg_hr = client.get_activity(activity_ids[x]).average_heartrate
+        print(f"Avg Heart Rate: {client.get_activity(activity_ids[x]).average_heartrate}")
+    
     strava_athlete = client.get_athlete()
 
     return render_template(
