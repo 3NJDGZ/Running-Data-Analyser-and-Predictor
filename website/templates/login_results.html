@@ -6,16 +6,18 @@
 
 {% block body %}
 
-<div class = "container mt-4">
-<div class="mt-4 p-5 bg-primary text-white rounded">
-  <h1>Authorization Results</h1>
-  <p>
-    Hi, <strong>{{ athlete.firstname }}</strong>.
-
-  Your access token:
-  <pre>{{ access_token|tojson(indent=2) }}</pre>
-</p>
-</div>
-</div>
+<section class="bg-dark text-light p-5 text-center text-sm-start">
+  <div class = "container mt-4">
+    <div class="mt-4 p-5 bg-secondary text-white rounded">
+      <h1> <span class="text-warning">Authorization</span> Results</h1>
+      <p>
+        Hi, <strong>{{ athlete.firstname }}</strong>.
+    
+      Your access token:
+      <pre>{{ access_token|tojson(indent=2) }}</pre>
+    </p>
+    </div>
+    </div>
+</section>
 
 {% endblock %}
