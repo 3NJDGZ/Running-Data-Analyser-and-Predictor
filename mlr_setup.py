@@ -77,9 +77,6 @@ if __name__ == "__main__":
     # Save the model for later use
     joblib.dump(mlr, 'linear_regression_model.pkl')
 
-    # Load the previously saved model
-    mlr_loaded = joblib.load('linear_regression_model.pkl')
-
    # Make a prediction using a DataFrame
     new_data = pd.DataFrame([[100, 2000, 150]], columns=['elevation gain (m)', 'distance (m)', 'average heart rate (bpm)'])
     y_pred1 = mlr.predict(new_data)

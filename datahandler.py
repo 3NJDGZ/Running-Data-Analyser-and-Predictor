@@ -32,7 +32,7 @@ class DataPreprocessor:
             (self.data['pace (min/km)'] <= 15) & 
             (self.data['average heart rate (bpm)'].notnull()) & 
             (self.data['average heart rate (bpm)'] > 0) &
-            (self.data['elevation gain (m)'] < 11128.0)
+            (self.data['elevation gain (m)'] < 200.0)
         ]
     
     def get_preprocessed_data(self):
