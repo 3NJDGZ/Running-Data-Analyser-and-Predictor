@@ -25,7 +25,7 @@ if __name__ == "__main__":
 
     # Visualize the data
     data_visualizer = DataVisualizer(processed_data)
-    data_visualizer.pairplot('strava_pairplot_after.png', ['distance (m)', 'elevation gain (m)', 'elapsed time (s)', 'average heart rate (bpm)'])
+    data_visualizer.pairplot('strava_pairplot_2.png', ['distance (m)', 'elevation gain (m)', 'elapsed time (s)', 'average heart rate (bpm)'])
 
     # Features (X)
     X = processed_data[['elevation gain (m)', 'distance (m)', 'average heart rate (bpm)']]

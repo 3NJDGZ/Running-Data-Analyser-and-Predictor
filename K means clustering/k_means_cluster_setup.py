@@ -22,7 +22,7 @@ if __name__ == "__main__":
     processed_data = data_preprocessor.get_preprocessed_data()
 
     # Select relevant features for clustering
-    features = processed_data[['distance (m)', 'elevation gain (m)', 'pace (min/km)', 'average heart rate (bpm)']]
+    features = processed_data[['distance (m)', 'elevation gain (m)', 'elapsed time (s)', 'average heart rate (bpm)', 'pace (min/km)']]
 
     # Scale the features
     scaler = StandardScaler()
@@ -47,11 +47,11 @@ if __name__ == "__main__":
 
     # Assign labels based on cluster centers analysis
     # Mapping each cluster to an intensity level: easy, medium, hard
-    cluster_centers_df['intensity'] = ['tempo run', 'long run', 'easy run']  # Adjust these labels based on your analysis
+    cluster_centers_df['intensity'] = ['easy run', 'endurance run', 'tempo run']  # Adjust these labels based on your analysis
     processed_data['intensity'] = processed_data['cluster'].map({
-        0: 'tempo run',  # Example mapping (adjust based on actual analysis of your cluster centers)
-        1: 'long run',
-        2: 'easy run'
+        0: 'easy run',  # Example mapping (adjust based on actual analysis of your cluster centers)
+        1: 'endurance run',
+        2: 'tempo run'
     })
 
     # Visualize the clusters
