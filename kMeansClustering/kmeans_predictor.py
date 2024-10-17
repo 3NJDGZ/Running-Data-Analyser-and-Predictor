@@ -2,7 +2,7 @@ import pandas as pd
 import joblib
 
 
-def predict(distance, elev, elap, avh):
+def predict(distance, elevationGain, elapsedTime, averageHeartRate):
     # Load the previously saved model
     kmeans = joblib.load('kMeansClustering/kmeans_model.pkl')
     scaler = joblib.load('kMeansClustering/scaler.pkl')
@@ -10,10 +10,10 @@ def predict(distance, elev, elap, avh):
     # Predict the cluster of a new run
     new_run = {
         'distance (m)': distance,
-        'elevation gain (m)': elev,
-        'elapsed time (s)': elap,
-        'average heart rate (bpm)': avh,
-        'pace (min/km)': (elap / 60) / (distance * 0.001),
+        'elevation gain (m)': elevationGain,
+        'elapsed time (s)': elapsedTime,
+        'average heart rate (bpm)': averageHeartRate,
+        'pace (min/km)': (elapsedTime / 60) / (distance * 0.001),
     }
 
     # Convert the new run to a DataFrame
@@ -37,7 +37,7 @@ def predict(distance, elev, elap, avh):
     predicted_intensity = cluster_label_map[predicted_cluster[0]]
 
     # Output the result
-    print(f"\nDistance (m): {distance}, Max Elevation (m): {elev}, Elapsed Time (s): {elap}, Avg HR: {avh}");
+    print(f"\nDistance (m): {distance}, Max Elevation (m): {elevationGain}, Elapsed Time (s): {elapsedTime}, Avg HR: {averageHeartRate}");
     print(f"Predicted cluster: {predicted_cluster[0]}")
     print(f"Predicted run intensity: {predicted_intensity}\n")
 
@@ -49,4 +49,4 @@ def predict(distance, elev, elap, avh):
 # predict(5000, 0, 1800, 130)  # 5 km run, no elevation, 30 min, low heart rate
 # predict(3000, 10, 600, 180)  # 3 km run, minimal elevation, 10 min, very high heart rate
 
-predict(5000, 24, 1473, 180) # my max run
+predict(1000, 24, 900, 180) # my max run
