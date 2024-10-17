@@ -1,4 +1,9 @@
-from datahandler import DataLoader, DataPreprocessor
+import sys
+import os
+# Add the project root directory to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from dataHandler import DataAnalysis, DataLoader, DataPreprocessor, DataVisualizer
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -27,7 +32,7 @@ if __name__ == "__main__":
     # Scale the features
     scaler = StandardScaler()
     features_scaled = scaler.fit_transform(features)
-    joblib.dump(scaler, "scaler.pkl")
+    joblib.dump(scaler, "kMeansClustering/scaler.pkl") # dump pkl files in corresponding folder
     
 
     # Apply K-Means clustering with 3 clusters
@@ -47,11 +52,11 @@ if __name__ == "__main__":
 
     # Assign labels based on cluster centers analysis
     # Mapping each cluster to an intensity level: easy, medium, hard
-    cluster_centers_df['intensity'] = ['easy run', 'endurance run', 'tempo run']  # Adjust these labels based on your analysis
+    cluster_centers_df['intensity'] = ['easy run', 'long run', 'intense run']  # Adjust these labels based on your analysis
     processed_data['intensity'] = processed_data['cluster'].map({
         0: 'easy run',  # Example mapping (adjust based on actual analysis of your cluster centers)
-        1: 'endurance run',
-        2: 'tempo run'
+        1: 'long run',
+        2: 'intense run'
     })
 
     # Visualize the clusters
@@ -62,6 +67,6 @@ if __name__ == "__main__":
     print(processed_data[['distance (m)', 'elapsed time (s)', 'elevation gain (m)', 'average heart rate (bpm)', 'pace (min/km)', 'intensity']])
 
     # Saving K means model
-    joblib.dump(kmeans, "kmeans_model.pkl")
+    joblib.dump(kmeans, "kMeansClustering/kmeans_model.pkl") # save to corresponding folder location
 
     

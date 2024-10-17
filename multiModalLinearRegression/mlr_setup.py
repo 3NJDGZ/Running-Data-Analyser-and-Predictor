@@ -1,4 +1,9 @@
-from datahandler import DataLoader, DataAnalysis, DataPreprocessor, DataVisualizer
+import sys
+import os
+# Add the project root directory to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from dataHandler import DataAnalysis, DataLoader, DataPreprocessor, DataVisualizer
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
@@ -25,7 +30,7 @@ if __name__ == "__main__":
 
     # Visualize the data
     data_visualizer = DataVisualizer(processed_data)
-    data_visualizer.pairplot('strava_pairplot_2.png', ['distance (m)', 'elevation gain (m)', 'elapsed time (s)', 'average heart rate (bpm)'])
+    data_visualizer.pairplot('multiModalLinearRegression/strava_pairplot_2.png', ['distance (m)', 'elevation gain (m)', 'elapsed time (s)', 'average heart rate (bpm)'])
 
     # Features (X)
     X = processed_data[['elevation gain (m)', 'distance (m)', 'average heart rate (bpm)']]
@@ -61,7 +66,7 @@ if __name__ == "__main__":
     plt.title('Actual vs Predicted Distance')
     plt.grid()
     plt.legend()
-    plt.savefig('mlr_prediction_vs_actial_values', dpi=300)
+    plt.savefig('multiModalLinearRegression/mlr_prediction_vs_actial_values', dpi=300)
 
     # Optional: Plotting Residuals
     plt.figure(figsize=(10, 6))
@@ -72,10 +77,10 @@ if __name__ == "__main__":
     plt.ylabel('Residuals')
     plt.title('Residuals Plot')
     plt.grid()
-    plt.savefig('mlr_residuals', dpi=300)
+    plt.savefig('multiModalLinearRegression/mlr_residuals', dpi=300)
 
     # Save the model for later use
-    joblib.dump(mlr, 'linear_regression_model.pkl')
+    joblib.dump(mlr, 'multiModalLinearRegression/linear_regression_model.pkl')
 
    # Make a prediction using a DataFrame
     new_data = pd.DataFrame([[100, 2000, 150]], columns=['elevation gain (m)', 'distance (m)', 'average heart rate (bpm)'])
