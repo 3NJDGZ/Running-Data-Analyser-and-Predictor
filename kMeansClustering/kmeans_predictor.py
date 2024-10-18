@@ -49,4 +49,4 @@ def predict(distance, elevationGain, elapsedTime, averageHeartRate):
 # predict(5000, 0, 1800, 130)  # 5 km run, no elevation, 30 min, low heart rate
 # predict(3000, 10, 600, 180)  # 3 km run, minimal elevation, 10 min, very high heart rate
 
-predict(1000, 24, 900, 180) # my max run
+predict(1000, 24, 900, 190) # my max run
