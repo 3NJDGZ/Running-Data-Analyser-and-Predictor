@@ -1,7 +1,13 @@
+import sys
+import os
+# Add the project root directory to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 # import necessary modules
 from flask import Blueprint, render_template, request
 from website.baseView import baseView
 from stravalib import Client, strava_model
+from kMeansClustering import kmeans_predictor
 
 # wrap auth routes in a class for OOP
 class authRoutes(baseView):
@@ -50,14 +56,27 @@ class authRoutes(baseView):
                 # print(f"Max Speed (m/s): {activity.max_speed}")
                 # print(f"Elapsed Time (s): {activity.elapsed_time}")
 
-            for x in range(len(activity_ids)):
-                activity_streams = client.get_activity_streams(activity_ids[x], types=['heartrate'], resolution='high')
+            for x in range(3):
+                averageHeartRate = client.get_activity(activity_ids[x]).average_heartrate
+                distance = client.get_activity(activity_ids[x]).distance
+                elapsedTime = client.get_activity(activity_ids[x]).elapsed_time
+                elevationHigh = client.get_activity(activity_ids[x]).elev_high
+                elevationLow = client.get_activity(activity_ids[x]).elev_low
+                elevationGain = elevationHigh - elevationLow
+                print(averageHeartRate, distance, elapsedTime, elevationGain)
 
-                if 'heartrate' in activity_streams.keys():
-                    heart_rate_data = activity_streams['heartrate'].data
-                    print("Heart Rate Data: ", heart_rate_data)
-                else:
-                    print("Heart rate data not available for this activity.")
+
+                if distance != 0:
+                    kmeans_predictor.predict(distance, elevationGain, elapsedTime, averageHeartRate)
+                
+
+            #     activity_streams = client.get_activity_streams(activity_ids[x], types=['heartrate'], resolution='high')
+
+            #     if 'heartrate' in activity_streams.keys():
+            #         heart_rate_data = activity_streams['heartrate'].data
+            #         print("Heart Rate Data: ", heart_rate_data)
+            #     else:
+            #         print("Heart rate data not available for this activity.")
                 # avg_hr = client.get_activity(activity_ids[x]).average_heartrate
                 # print(f"Avg Heart Rate: {avg_hr}")
             
