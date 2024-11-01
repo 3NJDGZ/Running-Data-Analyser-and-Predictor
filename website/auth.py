@@ -8,6 +8,7 @@ from flask import Blueprint, render_template, request
 from website.baseView import baseView
 from stravalib import Client, strava_model
 from kMeansClustering import kmeans_predictor
+import json
 
 # wrap auth routes in a class for OOP
 class authRoutes(baseView):
@@ -45,6 +46,10 @@ class authRoutes(baseView):
                 client_secret=self.__client_secret,
                 code=code
             )
+
+            # Save the token response as a JSON file
+            with open(r'website\token.json', "w") as f:
+                json.dump(access_token, f)
 
             # gets the athlete
             activities = client.get_activities()
@@ -102,15 +107,17 @@ class authRoutes(baseView):
 
         @self._flaskApp.route("/datavisualisation")
         def data_visualisation():
-            code = request.args.get("code")
-            client = Client()
+            with open(r'website\token.json', "r") as f:
+                token_response_refresh = json.load(f)
             
-            # gets access token
-            access_token = client.exchange_code_for_token(
+            client = Client()
+
+            refresh_response = client.refresh_access_token(
                 client_id=self.__client_id,
                 client_secret=self.__client_secret,
-                code=code
+                refresh_token=token_response_refresh["refresh_token"],  # Stored in your JSON file
             )
+
             activities = client.get_activities()
             activity_ids = [] # get the unique ids of each activity so we can get the 'detailed' activities object via the 'get_activity()' function
             activity_data = []
@@ -121,7 +128,7 @@ class authRoutes(baseView):
                 # print(f"Max Speed (m/s): {activity.max_speed}")
                 # print(f"Elapsed Time (s): {activity.elapsed_time}")
 
-            for x in range(3):
+            for x in range(3,5):
                 averageHeartRate = client.get_activity(activity_ids[x]).average_heartrate
                 distance = client.get_activity(activity_ids[x]).distance
                 elapsedTime = client.get_activity(activity_ids[x]).elapsed_time
