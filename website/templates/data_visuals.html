@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Recent Activities</title>
+{% endblock %}
+
+{% block body %}
+
+<section class="bg-dark text-light p-5 text-center text-sm-start">
+    <div class="container mt-4">
+        <div class="mt-4 p-5 bg-secondary text-white rounded">
+            <h1 class="text-warning">Recent Activities</h1>
+
+            {% if activity_data %}
+                <div class="activities">
+                    {% for activity in activity_data %}
+                        <div class="activity p-3 my-3 bg-dark rounded">
+                            <h3>Activity {{ loop.index }}</h3>
+                            <p><strong>Average Heart Rate:</strong> {{ activity.average_heart_rate }} bpm</p>
+                            <p><strong>Distance:</strong> {{ activity.distance }} meters</p>
+                            <p><strong>Elapsed Time:</strong> {{ activity.elapsed_time }} seconds</p>
+                            <p><strong>Elevation Gain:</strong> {{ activity.elevation_gain }} meters</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No recent activities found.</p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+{% endblock %}

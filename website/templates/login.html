@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+<!-- 'form' is used when we want user input; usually followed by input labels etc... -->
+<section class="bg-dark text-light p-5 text-center text-sm-start">
+	<div class="container">
+		<div class = "d-sm-flex">
+			<div>
+				<h1> Visualise your <span class="text-warning">Data</span></h1>
+				<p class="lead my-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+			</div>
+		</div>
+	</div>
+	<div class="container">
+		<div class="mt-4 p-5 bg-secondary text-white rounded">
+			<h1 align="center">Login using <span class="text-warning">Strava.</span></h1>
+			<p class="text-center">
+				Authenticate using your Strava account.
+			</p>
+			<div class="text-center">
+				<button id="connectStravaBtn" type="button" class="btn btn-warning btn-lg">Connect <b>STRAVA</b></button>
+			</div>
+		</div>
+	</div>
+</section>
+
+<script>
+    document.getElementById('connectStravaBtn').addEventListener('click', function() {
+        window.location.href = '{{ authorize_url }}';
+    });
+</script>
+
+
+{% endblock %}
