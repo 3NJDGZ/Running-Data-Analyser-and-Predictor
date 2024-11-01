@@ -49,6 +49,7 @@ class authRoutes(baseView):
             # gets the athlete
             activities = client.get_activities()
             activity_ids = [] # get the unique ids of each activity so we can get the 'detailed' activities object via the 'get_activity()' function
+            activity_data = []
             for activity in activities:
                 activity_ids.append(activity.id)
                 # print(f"\nActivity ID: {activity.id}")
@@ -65,6 +66,12 @@ class authRoutes(baseView):
                 elevationGain = elevationHigh - elevationLow
                 print(averageHeartRate, distance, elapsedTime, elevationGain)
 
+                activity_data.append({
+                    "average_heart_rate": averageHeartRate,
+                    "distance": distance,
+                    "elapsed_time": elapsedTime,
+                    "elevation_gain": elevationGain,
+        })
 
                 if distance != 0:
                     kmeans_predictor.predict(distance, elevationGain, elapsedTime, averageHeartRate)
@@ -90,4 +97,5 @@ class authRoutes(baseView):
                 "login_results.html",
                 athlete=strava_athlete,
                 access_token=access_token,
+                activity_data=activity_data,
             )

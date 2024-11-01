@@ -1,22 +1,38 @@
 {% extends 'base.html' %}
 
 {% block head %}
-
+<title>Authorization Results</title>
 {% endblock %}
 
 {% block body %}
 
 <section class="bg-dark text-light p-5 text-center text-sm-start">
-  <div class = "container mt-4">
-    <div class="mt-4 p-5 bg-secondary text-white rounded">
-      <h1> <span class="text-warning">Authorization</span> Results</h1>
-      <p>
-        Hi, <strong>{{ athlete.firstname }}</strong>.
-    
-      Your access token:
-      <pre>{{ access_token|tojson(indent=2) }}</pre>
-    </p>
-    </div>
+    <div class="container mt-4">
+        <div class="mt-4 p-5 bg-secondary text-white rounded">
+            <h1><span class="text-warning">Authorization</span> Results</h1>
+            <p>
+                Hi, <strong>{{ athlete.firstname }}</strong>!
+            </p>
+            <p>Your access token:</p>
+            <pre>{{ access_token|tojson(indent=2) }}</pre>
+
+            <h2 class="mt-5">Recent Activities</h2>
+            {% if activity_data %}
+                <div class="activities">
+                    {% for activity in activity_data %}
+                        <div class="activity p-3 my-3 bg-dark rounded">
+                            <h3>Activity {{ loop.index }}</h3>
+                            <p><strong>Average Heart Rate:</strong> {{ activity.average_heart_rate }} bpm</p>
+                            <p><strong>Distance:</strong> {{ activity.distance }} meters</p>
+                            <p><strong>Elapsed Time:</strong> {{ activity.elapsed_time }} seconds</p>
+                            <p><strong>Elevation Gain:</strong> {{ activity.elevation_gain }} meters</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No recent activities found.</p>
+            {% endif %}
+        </div>
     </div>
 </section>
 
