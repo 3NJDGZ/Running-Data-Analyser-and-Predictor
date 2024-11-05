@@ -93,15 +93,15 @@ class authRoutes(baseView):
                         distance, elevationGain, elapsedTime, averageHeartRate
                     )
 
-                activity_streams = client.get_activity_streams(
-                    activity_ids[x], types=["heartrate"], resolution="low"
-                )
+                # activity_streams = client.get_activity_streams(
+                #     activity_ids[x], types=["heartrate"], resolution="low"
+                # )
 
-                if "heartrate" in activity_streams.keys():
-                    heart_rate_data = activity_streams["heartrate"].data
-                    print("Heart Rate Data: ", heart_rate_data)
-                else:
-                    print("Heart rate data not available for this activity.")
+                # if "heartrate" in activity_streams.keys():
+                #     heart_rate_data = activity_streams["heartrate"].data
+                #     print("Heart Rate Data: ", heart_rate_data)
+                # else:
+                #     print("Heart rate data not available for this activity.")
             avg_hr = client.get_activity(activity_ids[x]).average_heartrate
             print(f"Avg Heart Rate: {avg_hr}")
 

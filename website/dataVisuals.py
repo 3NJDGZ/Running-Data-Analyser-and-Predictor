@@ -10,6 +10,10 @@ from website.baseView import baseView
 from stravalib import Client, strava_model
 from kMeansClustering import kmeans_predictor
 import json
+import matplotlib
+matplotlib.use('Agg')  # Use a non-interactive backend
+import matplotlib.pyplot as plt
+
 
 
 # wrap auth routes in a class for OOP
@@ -64,7 +68,31 @@ class dataVisualsRoutes(baseView):
                     }
                 )
 
+                activity_streams = client.get_activity_streams(activity_ids[1], types=['heartrate'], resolution='low')
+
+                if 'heartrate' in activity_streams.keys():
+                    heart_rate_data = activity_streams['heartrate'].data
+                    # print("Heart Rate Data: ", heart_rate_data)
+                    heart_rate_data = sorted(heart_rate_data)
+                    zone1 = len([hr for hr in heart_rate_data if 0 <= hr <= 120])
+                    zone2 = len([hr for hr in heart_rate_data if 121 <= hr <= 140])
+                    zone3 = len([hr for hr in heart_rate_data if 141 <= hr <= 160])
+                    zone4 = len([hr for hr in heart_rate_data if 161 <= hr <= 180])
+                    zone5 = len([hr for hr in heart_rate_data if 181 <= hr <= 210])
+                    zones_value = [zone1, zone2, zone3, zone4, zone5]
+                    zones_title = ['Zone 1', 'Zone 2', 'Zone 3', 'Zone 4', 'Zone 5']
+
+                    plt.pie(zones_value, labels=zones_title)
+
+                    plt.savefig("heart_rate_zones.png")
+                    plt.show()
+                else:
+                    print("Heart rate data not available for this activity.")
+                avg_hr = client.get_activity(activity_ids[1]).average_heartrate
+                # print(f"Avg Heart Rate: {avg_hr}")
+
             return render_template(
                 "data_visuals.html",
                 activity_data=activity_data,
+                avg_hr=avg_hr,
             )
