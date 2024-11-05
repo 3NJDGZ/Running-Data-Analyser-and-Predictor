@@ -13,7 +13,7 @@ import json
 
 
 # wrap auth routes in a class for OOP
-class authRoutes(baseView):
+class dataVisualsRoutes(baseView):
     def __init__(self, flaskApp):
         super().__init__(flaskApp)
         # setup necessary variables
@@ -27,37 +27,13 @@ class authRoutes(baseView):
 
     def _setupRoutes(self):
         # setup routes
-        @self._flaskApp.route("/")
-        def login():  # shows user a prompt to connect to strava
-            client = Client()
+        @self._flaskApp.route("/datavisualisation")
+        def data_visualisation():
+            with open(r"token.json", "r") as f:
+                access_token_file = json.load(f)
 
-            # creates auth url
-            url = client.authorization_url(
-                client_id=self.__client_id,
-                redirect_uri=self.__redirect_url,
-                scope=self.__request_scope,
-                approval_prompt="auto",
-            )
+            client = Client(access_token=access_token_file["access_token"])
 
-            return render_template("login.html", authorize_url=url)
-
-        @self._flaskApp.route("/authentication")
-        def logged_in():  # just shows their auth token, will show their data or something in the future
-            code = request.args.get("code")
-            client = Client()
-
-            # gets access token
-            access_token = client.exchange_code_for_token(
-                client_id=self.__client_id,
-                client_secret=self.__client_secret,
-                code=code,
-            )
-
-            # Save the token response as a JSON file
-            with open(r"token.json", "w") as f:
-                json.dump(access_token, f)
-
-            # gets the athlete
             activities = client.get_activities()
             activity_ids = []  # get the unique ids of each activity so we can get the 'detailed' activities object via the 'get_activity()' function
             activity_data = []
@@ -68,7 +44,7 @@ class authRoutes(baseView):
                 # print(f"Max Speed (m/s): {activity.max_speed}")
                 # print(f"Elapsed Time (s): {activity.elapsed_time}")
 
-            for x in range(3):
+            for x in range(3, 5):
                 averageHeartRate = client.get_activity(
                     activity_ids[x]
                 ).average_heartrate
@@ -88,28 +64,7 @@ class authRoutes(baseView):
                     }
                 )
 
-                if distance != 0:
-                    kmeans_predictor.predict(
-                        distance, elevationGain, elapsedTime, averageHeartRate
-                    )
-
-                activity_streams = client.get_activity_streams(
-                    activity_ids[x], types=["heartrate"], resolution="low"
-                )
-
-                if "heartrate" in activity_streams.keys():
-                    heart_rate_data = activity_streams["heartrate"].data
-                    print("Heart Rate Data: ", heart_rate_data)
-                else:
-                    print("Heart rate data not available for this activity.")
-            avg_hr = client.get_activity(activity_ids[x]).average_heartrate
-            print(f"Avg Heart Rate: {avg_hr}")
-
-            strava_athlete = client.get_athlete()
-
             return render_template(
-                "login_results.html",
-                athlete=strava_athlete,
-                access_token=access_token,
+                "data_visuals.html",
                 activity_data=activity_data,
             )
