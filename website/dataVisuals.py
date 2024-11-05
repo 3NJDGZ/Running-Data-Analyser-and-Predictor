@@ -79,12 +79,39 @@ class dataVisualsRoutes(baseView):
                     zone3 = len([hr for hr in heart_rate_data if 141 <= hr <= 160])
                     zone4 = len([hr for hr in heart_rate_data if 161 <= hr <= 180])
                     zone5 = len([hr for hr in heart_rate_data if 181 <= hr <= 210])
+                    # Create lists for values and labels
                     zones_value = [zone1, zone2, zone3, zone4, zone5]
-                    zones_title = ['Zone 1', 'Zone 2', 'Zone 3', 'Zone 4', 'Zone 5']
+                    zones_title = ['Zone 1 (0-120 bpm)', 'Zone 2 (121-140 bpm)', 
+                                'Zone 3 (141-160 bpm)', 'Zone 4 (161-180 bpm)', 
+                                'Zone 5 (181-210 bpm)']
 
-                    plt.pie(zones_value, labels=zones_title)
+                   # Create the pie chart
+                    plt.figure(figsize=(8, 8))
 
-                    plt.savefig("heart_rate_zones.png")
+                    # Define custom colors for better distinction
+                    colors = ['#ff9999', '#66b3ff', '#99ff99', '#ffcc99', '#c2c2f0']  # Customize colors here
+                    
+                    # Explode the slices for better visibility
+                    explode = (0.1, 0, 0, 0, 0)  # Only "explode" the first slice (Zone 1)
+
+                    wedges, texts, autotexts = plt.pie(
+                        zones_value, 
+                        labels=None,  # Set labels to None for the pie chart
+                        autopct='%1.1f%%', 
+                        startangle=140, 
+                        colors=colors,
+                        explode=explode
+                    )
+
+                    # Adding the legend outside the pie chart
+                    plt.legend(wedges, zones_title, title="Heart Rate Zones", loc="center left", bbox_to_anchor=(1, 0, 0.5, 1))
+
+                    # Improve aesthetics
+                    plt.title('Heart Rate Zones Distribution', fontsize=16)
+                    plt.axis('equal')  # Equal aspect ratio ensures the pie chart is circular.
+
+                    # Save and show the plot
+                    plt.savefig("heart_rate_zones.png", bbox_inches='tight')
                     plt.show()
                 else:
                     print("Heart rate data not available for this activity.")
