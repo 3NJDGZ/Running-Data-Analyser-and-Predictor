@@ -54,7 +54,7 @@ class authRoutes(baseView):
             )
 
             # Save the token response as a JSON file
-            with open(r"token.json", "w") as f:
+            with open(r"website/token.json", "w") as f:
                 json.dump(access_token, f)
 
             # gets the athlete
