@@ -54,7 +54,7 @@ class authRoutes(baseView):
             )
 
             # Save the token response as a JSON file
-            with open(r"website\token.json", "w") as f:
+            with open(r"website/token.json", "w") as f:
                 json.dump(access_token, f)
 
             # gets the athlete
@@ -93,15 +93,15 @@ class authRoutes(baseView):
                         distance, elevationGain, elapsedTime, averageHeartRate
                     )
 
-                activity_streams = client.get_activity_streams(
-                    activity_ids[x], types=["heartrate"], resolution="high"
-                )
+                # activity_streams = client.get_activity_streams(
+                #     activity_ids[x], types=["heartrate"], resolution="low"
+                # )
 
-                if "heartrate" in activity_streams.keys():
-                    heart_rate_data = activity_streams["heartrate"].data
-                    print("Heart Rate Data: ", heart_rate_data)
-                else:
-                    print("Heart rate data not available for this activity.")
+                # if "heartrate" in activity_streams.keys():
+                #     heart_rate_data = activity_streams["heartrate"].data
+                #     print("Heart Rate Data: ", heart_rate_data)
+                # else:
+                #     print("Heart rate data not available for this activity.")
             avg_hr = client.get_activity(activity_ids[x]).average_heartrate
             print(f"Avg Heart Rate: {avg_hr}")
 
@@ -111,55 +111,5 @@ class authRoutes(baseView):
                 "login_results.html",
                 athlete=strava_athlete,
                 access_token=access_token,
-                activity_data=activity_data,
-            )
-
-        @self._flaskApp.route("/datavisualisation")
-        def data_visualisation():
-            with open(r"website\token.json", "r") as f:
-                token_response_refresh = json.load(f)
-
-            client = Client()
-
-            refresh_response = client.refresh_access_token(
-                client_id=self.__client_id,
-                client_secret=self.__client_secret,
-                refresh_token=token_response_refresh[
-                    "refresh_token"
-                ],  # Stored in your JSON file
-            )
-
-            activities = client.get_activities()
-            activity_ids = []  # get the unique ids of each activity so we can get the 'detailed' activities object via the 'get_activity()' function
-            activity_data = []
-            for activity in activities:
-                activity_ids.append(activity.id)
-                # print(f"\nActivity ID: {activity.id}")
-                # print(f"Distance (m): {activity.distance}")
-                # print(f"Max Speed (m/s): {activity.max_speed}")
-                # print(f"Elapsed Time (s): {activity.elapsed_time}")
-
-            for x in range(3, 5):
-                averageHeartRate = client.get_activity(
-                    activity_ids[x]
-                ).average_heartrate
-                distance = client.get_activity(activity_ids[x]).distance
-                elapsedTime = client.get_activity(activity_ids[x]).elapsed_time
-                elevationHigh = client.get_activity(activity_ids[x]).elev_high
-                elevationLow = client.get_activity(activity_ids[x]).elev_low
-                elevationGain = elevationHigh - elevationLow
-                print(averageHeartRate, distance, elapsedTime, elevationGain)
-
-                activity_data.append(
-                    {
-                        "average_heart_rate": averageHeartRate,
-                        "distance": distance,
-                        "elapsed_time": elapsedTime,
-                        "elevation_gain": elevationGain,
-                    }
-                )
-
-            return render_template(
-                "data_visuals.html",
                 activity_data=activity_data,
             )
