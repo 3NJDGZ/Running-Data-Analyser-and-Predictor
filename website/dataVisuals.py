@@ -57,6 +57,7 @@ class dataVisualsRoutes(baseView):
                 elevationHigh = client.get_activity(activity_ids[x]).elev_high
                 elevationLow = client.get_activity(activity_ids[x]).elev_low
                 elevationGain = elevationHigh - elevationLow
+                elevationGain = round(elevationGain, 1)
                 print(averageHeartRate, distance, elapsedTime, elevationGain)
 
                 activity_data.append(
