@@ -138,7 +138,10 @@ class dataVisualsRoutes(baseView):
                     )  # Equal aspect ratio ensures the pie chart is circular.
 
                     # Save and show the plot
-                    plt.savefig("heart_rate_zones.png", bbox_inches="tight")
+                    plt.savefig(
+                        "website/static/statisticalGraphsAndCharts/heart_rate_zones.png",
+                        bbox_inches="tight",
+                    )
                     plt.show()
                 else:
                     print("Heart rate data not available for this activity.")
