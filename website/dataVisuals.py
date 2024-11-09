@@ -47,6 +47,7 @@ class dataVisualsRoutes(baseView):
                     activity_ids.append(activity.id)
 
             # will need to change this, abstract it to another object as we our doing data harvesting twice therefore using too much API calls as this code is also repeated in auth.py
+            print("\nData Visuals!")
             for x in range(3):
                 averageHeartRate = client.get_activity(
                     activity_ids[x]
