@@ -14,16 +14,14 @@ import json
 
 # wrap auth routes in a class for OOP
 class authRoutes(baseView):
-    def __init__(self, flaskApp):
+    def __init__(self, flaskApp, mongoDB):
         super().__init__(flaskApp)
+        self.__mongoDB = mongoDB
+
         # setup necessary variables
-        self.__client_id, self.__client_secret = (
-            open("client_secrets.txt").read().strip().split(",")
-        )
+        self.__client_id, self.__client_secret = (open("client_secrets.txt").read().strip().split(","))
         self.__request_scope = ["read_all", "profile:read_all", "activity:read_all"]
-        self.__redirect_url = (
-            "http://127.0.0.1:5000/authentication"  # this is redirect url
-        )
+        self.__redirect_url = ("http://127.0.0.1:5000/authentication")
 
     def _setupRoutes(self):
         # setup routes
@@ -66,10 +64,12 @@ class authRoutes(baseView):
                 if client.get_activity(activity.id).distance != 0:
                     activity_ids.append(activity.id)
 
+            strava_athlete = client.get_athlete()
+
             for x in range(3):
-                averageHeartRate = client.get_activity(
-                    activity_ids[x]
-                ).average_heartrate
+                print(f"Activity Name: {client.get_activity(activity_ids[x]).name}")
+                print(f"Activity ID: {client.get_activity(activity_ids[x]).id}")
+                averageHeartRate = client.get_activity(activity_ids[x]).average_heartrate
                 distance = client.get_activity(activity_ids[x]).distance
                 elapsedTime = client.get_activity(activity_ids[x]).elapsed_time
                 elevationHigh = client.get_activity(activity_ids[x]).elev_high
@@ -94,7 +94,7 @@ class authRoutes(baseView):
                     }
                 )
 
-            print(len(activity_data))
+                self.__mongoDB.insertRunningData(strava_athlete.id, client.get_activity(activity_ids[x]).id, distance, elapsedTime, elevationHigh, elevationLow, predictedIntensity, averageHeartRate)
 
             # activity_streams = client.get_activity_streams(
             #     activity_ids[x], types=["heartrate"], resolution="low"
@@ -109,7 +109,9 @@ class authRoutes(baseView):
             # avg_hr = client.get_activity(activity_ids[x]).average_heartrate
             # print(f"Avg Heart Rate: {avg_hr}")
 
-            strava_athlete = client.get_athlete()
+            print(
+                f"Athlete Name: {strava_athlete.firstname}, Athlete ID: {strava_athlete.id}"
+            )
 
             return render_template(
                 "login_results.html",
