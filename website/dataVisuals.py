@@ -46,7 +46,8 @@ class dataVisualsRoutes(baseView):
                         "distance": doc["Distance"],
                         "elapsed_time": doc["ElapsedTime"],
                         "elevation_gain": round((doc["ElevationH"] - doc["ElevationL"]), 1),
-                        "predicted_intensity": doc["PredictedIntensity"]
+                        "predicted_intensity": doc["PredictedIntensity"],
+                        "activity_name": doc["ActivityName"]
 
                     }
                 )
@@ -69,6 +70,7 @@ class dataVisualsRoutes(baseView):
             zone3 = len([hr for hr in heart_rate_data if 141 <= hr <= 160])
             zone4 = len([hr for hr in heart_rate_data if 161 <= hr <= 180])
             zone5 = len([hr for hr in heart_rate_data if 181 <= hr <= 210])
+
             # Create lists for values and labels
             zones_value = [zone1, zone2, zone3, zone4, zone5]
             zones_title = [

@@ -1,4 +1,5 @@
 from flask_pymongo import PyMongo
+import redis
 
 class DB:
     def __init__(self, app, mongoURI):
@@ -7,6 +8,9 @@ class DB:
         self.__app = app
         self.configureConnection()
         self.__RDATCollection = self.__DB.db.RDAT
+
+        self.__redis = redis.Redis(host='localhost', port=6379, decode_responses=True)
+
 
     def getMongoURI(self):
         return self.__mongoURI

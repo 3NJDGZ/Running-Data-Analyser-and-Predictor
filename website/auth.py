@@ -57,13 +57,13 @@ class authRoutes(baseView):
                 json.dump(access_token, f)
 
             strava_athlete = client.get_athlete()
-
-            activities = client.get_activities(None, None, 5) 
+            activities = client.get_activities(None, None, 15) 
             activity_ids = []  # get the unique ids of each activity so we can get the 'detailed' activities object via the 'get_activity()' function
             activity_data = []  # will be used to hold data
             for activity in activities:
-                # check if the activity is a run and retrieve the latest two runs
-                if client.get_activity(activity.id).distance != 0 and len(activity_ids) <= 2:
+                rst = activity.sport_type # relaxed sport type
+                if rst.root == "Run" and len(activity_ids) <= 4:
+                    print(activity.id)
                     activity_ids.append(activity.id)
 
             # check if data entry already exists in database, if not then insert into database
@@ -101,6 +101,7 @@ class authRoutes(baseView):
                             "elapsed_time": elapsedTime,
                             "elevation_gain": elevationGain,
                             "predicted_intensity": predictedIntensity,
+                            "activity_name": activityName
                         }
                     )
 
@@ -116,7 +117,8 @@ class authRoutes(baseView):
                             "distance": dataToBeAdded["Distance"],
                             "elapsed_time": dataToBeAdded["ElapsedTime"],
                             "elevation_gain": round((dataToBeAdded["ElevationH"] - dataToBeAdded["ElevationL"]), 1),
-                            "predicted_intensity": dataToBeAdded["PredictedIntensity"]
+                            "predicted_intensity": dataToBeAdded["PredictedIntensity"],
+                            "activity_name": dataToBeAdded["ActivityName"]
                         }
                     )
                     print("Data Entry already exists!")
