@@ -56,63 +56,71 @@ class authRoutes(baseView):
             with open(r"website/token.json", "w") as f:
                 json.dump(access_token, f)
 
-            activities = client.get_activities()  # gets the athlete's activities
+            strava_athlete = client.get_athlete()
+
+            activities = client.get_activities(None, None, 5) 
             activity_ids = []  # get the unique ids of each activity so we can get the 'detailed' activities object via the 'get_activity()' function
             activity_data = []  # will be used to hold data
             for activity in activities:
-                # check if the activity is a run
-                if client.get_activity(activity.id).distance != 0:
+                # check if the activity is a run and retrieve the latest two runs
+                if client.get_activity(activity.id).distance != 0 and len(activity_ids) <= 2:
                     activity_ids.append(activity.id)
 
-            strava_athlete = client.get_athlete()
+            # check if data entry already exists in database, if not then insert into database
+            for activityID in activity_ids:
+                if self.__mongoDB.retrieveRunningData(activityID, strava_athlete.id) is None:
+                    activityName = client.get_activity(activityID).name
+                    averageHeartRate = client.get_activity(activityID).average_heartrate
+                    distance = client.get_activity(activityID).distance
+                    elapsedTime = client.get_activity(activityID).elapsed_time
+                    elevationHigh = client.get_activity(activityID).elev_high
+                    elevationLow = client.get_activity(activityID).elev_low
+                    elevationGain = elevationHigh - elevationLow
+                    elevationGain = round(elevationGain, 1)
 
-            for x in range(3):
-                print(f"Activity Name: {client.get_activity(activity_ids[x]).name}")
-                print(f"Activity ID: {client.get_activity(activity_ids[x]).id}")
-                averageHeartRate = client.get_activity(activity_ids[x]).average_heartrate
-                distance = client.get_activity(activity_ids[x]).distance
-                elapsedTime = client.get_activity(activity_ids[x]).elapsed_time
-                elevationHigh = client.get_activity(activity_ids[x]).elev_high
-                elevationLow = client.get_activity(activity_ids[x]).elev_low
-                elevationGain = elevationHigh - elevationLow
-                elevationGain = round(elevationGain, 1)
-                print(averageHeartRate, distance, elapsedTime, elevationGain)
+                    activity_streams = client.get_activity_streams(
+                        activityID, types=["heartrate"], resolution="low"
+                    )
 
-                # predict intensity of the run
-                predictedIntensity = kmeans_predictor.predict(
-                    distance, elevationGain, elapsedTime, averageHeartRate
-                )
+                    # getting HR stream data
+                    if "heartrate" in activity_streams.keys():
+                        hrStream = activity_streams["heartrate"].data
+                    else:
+                        hrStream = [0]
+    
+                    # predict intensity of the run
+                    predictedIntensity = kmeans_predictor.predict(
+                        distance, elevationGain, elapsedTime, averageHeartRate
+                    )
 
-                # setup the data
-                activity_data.append(
-                    {
-                        "average_heart_rate": averageHeartRate,
-                        "distance": distance,
-                        "elapsed_time": elapsedTime,
-                        "elevation_gain": elevationGain,
-                        "predicted_intensity": predictedIntensity,
-                    }
-                )
+                    # setup the data to show on webpage
+                    activity_data.append(
+                        {
+                            "average_heart_rate": averageHeartRate,
+                            "distance": distance,
+                            "elapsed_time": elapsedTime,
+                            "elevation_gain": elevationGain,
+                            "predicted_intensity": predictedIntensity,
+                        }
+                    )
 
-                self.__mongoDB.insertRunningData(strava_athlete.id, client.get_activity(activity_ids[x]).id, distance, elapsedTime, elevationHigh, elevationLow, predictedIntensity, averageHeartRate)
+                    self.__mongoDB.insertRunningData(strava_athlete.id, client.get_activity(activityID).id, distance, elapsedTime, elevationHigh, elevationLow, predictedIntensity, averageHeartRate, activityName, strava_athlete.firstname, hrStream)
+                    print("Data inserted!")
+                else:
+                    dataToBeAdded = self.__mongoDB.retrieveRunningData(activityID, strava_athlete.id)
 
-            # activity_streams = client.get_activity_streams(
-            #     activity_ids[x], types=["heartrate"], resolution="low"
-            # )
-
-            # if "heartrate" in activity_streams.keys():
-            #     heart_rate_data = activity_streams["heartrate"].data
-            #     print("Heart Rate Data: ", heart_rate_data)
-            # else:
-            #     print("Heart rate data not available for this activity.")
-            #
-            # avg_hr = client.get_activity(activity_ids[x]).average_heartrate
-            # print(f"Avg Heart Rate: {avg_hr}")
-
-            print(
-                f"Athlete Name: {strava_athlete.firstname}, Athlete ID: {strava_athlete.id}"
-            )
-
+                    # data formatting  
+                    activity_data.append(
+                        {
+                            "average_heart_rate": dataToBeAdded["AVGHR"],
+                            "distance": dataToBeAdded["Distance"],
+                            "elapsed_time": dataToBeAdded["ElapsedTime"],
+                            "elevation_gain": round((dataToBeAdded["ElevationH"] - dataToBeAdded["ElevationL"]), 1),
+                            "predicted_intensity": dataToBeAdded["PredictedIntensity"]
+                        }
+                    )
+                    print("Data Entry already exists!")
+                    
             return render_template(
                 "login_results.html",
                 athlete=strava_athlete,
