@@ -66,7 +66,7 @@ class authRoutes(baseView):
                     print(activity.id)
                     activity_ids.append(activity.id)
 
-            # check if data entry already exists in database, if not then insert into database
+            # check if data entry already exists in mongoDB, if not then insert into database
             for activityID in activity_ids:
                 if self.__mongoDB.retrieveRunningData(activityID, strava_athlete.id) is None:
                     activityName = client.get_activity(activityID).name
