@@ -4,6 +4,7 @@ from website.views import viewRoutes
 from website.auth import authRoutes
 from website.dataVisuals import dataVisualsRoutes
 from website.db import DB
+from website.cacheRedis import cacheRedis
 
 # get mongoURI from txt file
 with open("mongoURI.txt", "r") as file:
@@ -15,18 +16,20 @@ class flaskAppWrapper:
         # create and setup the flask app
         self.__app = create_app()  
         self.__app.config["MONGO_URI"] = (mongoURI)
+
         # Setup the mongoDB connection 
         self.__mongoDB = DB(self.__app, mongoURI)
         self.__mongoDB.configureConnection()
-        self.setupRoutes()  # sets up the routes for the browser
-        
-        #print(self.__mongoDB.checkExistingData(813137285))
 
+        self.__cacheRedis = cacheRedis()
+
+        self.setupRoutes()  
+        
     def setupRoutes(self):
         # create the different routes, and call their protected methods which are overridden from baseView abstract super class
         views = viewRoutes(self.__app)
-        auth = authRoutes(self.__app, self.__mongoDB)
-        dataVisuals = dataVisualsRoutes(self.__app, self.__mongoDB)
+        auth = authRoutes(self.__app, self.__mongoDB, self.__cacheRedis)
+        dataVisuals = dataVisualsRoutes(self.__app, self.__mongoDB, self.__cacheRedis)
         views._setupRoutes()
         auth._setupRoutes()
         dataVisuals._setupRoutes()

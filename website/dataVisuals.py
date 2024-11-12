@@ -1,6 +1,8 @@
 import sys
 import os
 
+from website.cacheRedis import cacheRedis
+
 # Add the project root directory to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -18,9 +20,10 @@ import matplotlib.pyplot as plt
 
 # wrap auth routes in a class for OOP
 class dataVisualsRoutes(baseView):
-    def __init__(self, flaskApp, mongoDB):
+    def __init__(self, flaskApp, mongoDB, cachRedis):
         super().__init__(flaskApp)
         self.__mongoDB = mongoDB
+        self.__cacheRedis = cacheRedis
 
     def _setupRoutes(self):
         # setup routes
