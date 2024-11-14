@@ -13,10 +13,9 @@ import json
 
 # wrap auth routes in a class for OOP
 class authRoutes(baseView):
-    def __init__(self, flaskApp, mongoDB, cacheRedis):
+    def __init__(self, flaskApp, cachingSystem):
         super().__init__(flaskApp)
-        self.__mongoDB = mongoDB
-        self.__cacheRedis = cacheRedis
+        self.__cachingSystem = cachingSystem
 
         # setup necessary variables
         self.__client_id, self.__client_secret = (open("client_secrets.txt").read().strip().split(","))
@@ -66,7 +65,7 @@ class authRoutes(baseView):
                     print(activity.id)
                     activity_ids.append(activity.id)
             
-            activity_data = self.__mongoDB.getActivityData(activity_ids, client, strava_athlete, activity_data)
+            activity_data = self.__cachingSystem.getActivityData(activity_ids, client, strava_athlete, activity_data)
 
             return render_template(
                 "login_results.html",

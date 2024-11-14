@@ -1,57 +1,17 @@
-from flask_pymongo import PyMongo
-from pandas.core.frame import dataclasses_to_dicts
 from kMeansClustering import kmeans_predictor
+from website.cachingService.cachingClient import CacheClient
+from website.cachingService.databaseClient import DatabaseClient
 
-class DB:
-    def __init__(self, app, mongoURI, cr):
-        self.cr = cr # cache redis object 
-        self.__mongoURI = mongoURI
-        self.__DB = PyMongo()
-        self.__app = app
-        self.configureConnection()
-        self.__RDATCollection = self.__DB.db.RDAT
-
-    def getMongoURI(self):
-        return self.__mongoURI
-    
-    def configureConnection(self):
-        self.__DB.init_app(self.__app) 
-
-    def retrieveRunningData(self, activityID, athleteID):
-        cursor = self.__RDATCollection.find({"ActivityID": activityID,
-                                             "AthleteID": athleteID})
-
-        for doc in cursor:
-            return doc
-
-    def retrieveAthleteActivities(self, athleteID):
-        cursor = self.__RDATCollection.find({"AthleteID": athleteID})
-        docs = []
-
-        for doc in cursor:
-            docs.append(doc)
-
-        return docs
-
-    def insertRunningData(self, athleteID, activityID, distance, time, elevationH, elevationL, predictedIntensity, avgHR, activityName, athleteFirstName, hrStream):
-        dataToBeAdded = {"AthleteID": athleteID,
-                         "AthleteFirstName": athleteFirstName,
-                         "ActivityID": activityID,
-                         "ActivityName": activityName,
-                         "Distance": distance,
-                         "ElapsedTime": time,
-                         "ElevationH": elevationH,
-                         "ElevationL": elevationL,
-                         "PredictedIntensity": predictedIntensity,
-                         "AVGHR": avgHR,
-                         "HRStream": hrStream}
-
-        self.__RDATCollection.insert_one(dataToBeAdded)
+class CachingSystem:
+    def __init__(self, cacheClient: CacheClient, dbClient: DatabaseClient):
+        self.__cacheClient = cacheClient
+        self.__dbClient = dbClient
 
     def getActivityData(self, activity_ids, client, strava_athlete, activity_data):
         # check if data entry already exists in mongoDB, if not then insert into database
         for activityID in activity_ids:
-            if self.retrieveRunningData(activityID, strava_athlete.id) is None:
+            if self.__cacheClient.getDataFromKey(self.__cacheClient.createKey(activityID)) is None:
+                print("Cache Miss!")
                 activityName = client.get_activity(activityID).name
                 averageHeartRate = client.get_activity(activityID).average_heartrate
                 distance = client.get_activity(activityID).distance
@@ -88,14 +48,13 @@ class DB:
 
                 activity_data.append(dataToBeAdded)
 
-                self.insertRunningData(strava_athlete.id, client.get_activity(activityID).id, distance, elapsedTime, elevationHigh, elevationLow, predictedIntensity, averageHeartRate, activityName, strava_athlete.firstname, hrStream)
-                print("Data inserted!")
+                self.__dbClient.insertRunningData(strava_athlete.id, client.get_activity(activityID).id, distance, elapsedTime, elevationHigh, elevationLow, predictedIntensity, averageHeartRate, activityName, strava_athlete.firstname, hrStream)
                 
                 # insert data into Redis
-                self.cr.insertJSONData(600, self.cr.createKey(activityID), dataToBeAdded)
+                self.__cacheClient.insertJSONData(600, self.__cacheClient.createKey(activityID), dataToBeAdded)
             else:
                 # get data from redis cloud cache instead of mongoDB
-                dataToBeAdded = self.cr.getDataFromKey(self.cr.createKey(activityID))
+                dataToBeAdded = self.__cacheClient.getDataFromKey(self.__cacheClient.createKey(activityID))
 
                 if dataToBeAdded is not None:
                     # data formatting  
@@ -114,7 +73,7 @@ class DB:
                 else:
                     print("Data does not exist on redis DB! ")
                     print("Getting data from mongoDB!")
-                    dataToBeAdded = self.retrieveRunningData(activityID, strava_athlete.id)
+                    dataToBeAdded = self.__dbClient.retrieveRunningData(activityID, strava_athlete.id)
 
                     test = {
                         "average_heart_rate": dataToBeAdded["AVGHR"],
@@ -138,10 +97,8 @@ class DB:
                     print(test)
 
                     # insert into redis database
-                    self.cr.insertJSONData(600, self.cr.createKey(activityID), test)
+                    self.__cacheClient.insertJSONData(600, self.__cacheClient.createKey(activityID), test)
                     print("Inserting data into redis DB!")
 
         return activity_data
         
-
-

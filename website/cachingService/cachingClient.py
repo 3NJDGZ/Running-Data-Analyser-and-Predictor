@@ -1,7 +1,7 @@
 import redis
 import json
 
-class cacheRedis:
+class CacheClient:
     def __init__(self):
 
         # retrieve the secrets for redis connection
