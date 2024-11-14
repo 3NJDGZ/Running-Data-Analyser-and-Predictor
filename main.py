@@ -17,11 +17,11 @@ class flaskAppWrapper:
         self.__app = create_app()  
         self.__app.config["MONGO_URI"] = (mongoURI)
 
-        # Setup the mongoDB connection 
-        self.__mongoDB = DB(self.__app, mongoURI)
-        self.__mongoDB.configureConnection()
-
         self.__cacheRedis = cacheRedis()
+
+        # Setup the mongoDB connection 
+        self.__mongoDB = DB(self.__app, mongoURI, cacheRedis())
+        self.__mongoDB.configureConnection()
 
         self.setupRoutes()  
         

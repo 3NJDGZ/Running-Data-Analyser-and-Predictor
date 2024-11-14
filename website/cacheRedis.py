@@ -18,6 +18,10 @@ class cacheRedis:
         else:
             print("Could not connect!")
 
+    def getDataFromKey(self, key):
+        if self.__redisClient.get(key) is not None:
+            return json.loads(self.__redisClient.get(key))
+        return None
 
     def insertJSONData(self, TTL, key, jsonValue):
         formattedData = json.dumps(jsonValue)
@@ -31,9 +35,7 @@ class cacheRedis:
         else:
             print(f"No JSON object found at key: '{key}'")
         return False
+    
+    def createKey(self, activityID):
+        return "activity:" + str(activityID)
 
-
-testCacheRedis = cacheRedis()
-testCacheRedis.insertJSONData(20, 'user:1000', {"AthleteID": 5032, "AthleteName": "Alejandro", "SportType": "Run"})
-testCacheRedis.checkIfJSONDocExistsAtKey('user:1000')
-testCacheRedis.checkIfJSONDocExistsAtKey('user:1001')

@@ -1,17 +1,15 @@
 from flask_pymongo import PyMongo
+from pandas.core.frame import dataclasses_to_dicts
 from kMeansClustering import kmeans_predictor
-import redis
 
 class DB:
-    def __init__(self, app, mongoURI):
+    def __init__(self, app, mongoURI, cr):
+        self.cr = cr # cache redis object 
         self.__mongoURI = mongoURI
         self.__DB = PyMongo()
         self.__app = app
         self.configureConnection()
         self.__RDATCollection = self.__DB.db.RDAT
-
-        self.__redis = redis.Redis(host='localhost', port=6379, decode_responses=True)
-
 
     def getMongoURI(self):
         return self.__mongoURI
@@ -22,6 +20,7 @@ class DB:
     def retrieveRunningData(self, activityID, athleteID):
         cursor = self.__RDATCollection.find({"ActivityID": activityID,
                                              "AthleteID": athleteID})
+
         for doc in cursor:
             return doc
 
@@ -78,8 +77,7 @@ class DB:
                 )
 
                 # setup the data to show on webpage
-                activity_data.append(
-                    {
+                dataToBeAdded = {
                         "average_heart_rate": averageHeartRate,
                         "distance": distance,
                         "elapsed_time": elapsedTime,
@@ -87,25 +85,61 @@ class DB:
                         "predicted_intensity": predictedIntensity,
                         "activity_name": activityName
                     }
-                )
+
+                activity_data.append(dataToBeAdded)
 
                 self.insertRunningData(strava_athlete.id, client.get_activity(activityID).id, distance, elapsedTime, elevationHigh, elevationLow, predictedIntensity, averageHeartRate, activityName, strava_athlete.firstname, hrStream)
                 print("Data inserted!")
+                
+                # insert data into Redis
+                self.cr.insertJSONData(600, self.cr.createKey(activityID), dataToBeAdded)
             else:
-                dataToBeAdded = self.retrieveRunningData(activityID, strava_athlete.id)
+                # get data from redis cloud cache instead of mongoDB
+                dataToBeAdded = self.cr.getDataFromKey(self.cr.createKey(activityID))
 
-                # data formatting  
-                activity_data.append(
-                    {
+                if dataToBeAdded is not None:
+                    # data formatting  
+                    activity_data.append(
+                        {
+                            "average_heart_rate": dataToBeAdded["average_heart_rate"],
+                            "distance": dataToBeAdded["distance"],
+                            "elapsed_time": dataToBeAdded["elapsed_time"],
+                            "elevation_gain": dataToBeAdded["elevation_gain"],
+                            "predicted_intensity": dataToBeAdded["predicted_intensity"],
+                            "activity_name": dataToBeAdded["activity_name"]
+                        }
+                    )
+                    print("Data Entry already exists on redis DB!")
+                    print("Getting data from redis DB!")
+                else:
+                    print("Data does not exist on redis DB! ")
+                    print("Getting data from mongoDB!")
+                    dataToBeAdded = self.retrieveRunningData(activityID, strava_athlete.id)
+
+                    test = {
                         "average_heart_rate": dataToBeAdded["AVGHR"],
                         "distance": dataToBeAdded["Distance"],
                         "elapsed_time": dataToBeAdded["ElapsedTime"],
                         "elevation_gain": round((dataToBeAdded["ElevationH"] - dataToBeAdded["ElevationL"]), 1),
                         "predicted_intensity": dataToBeAdded["PredictedIntensity"],
                         "activity_name": dataToBeAdded["ActivityName"]
-                    }
-                )
-                print("Data Entry already exists!")
+                        }
+
+                    activity_data.append(
+                        {
+                            "average_heart_rate": dataToBeAdded["AVGHR"],
+                            "distance": dataToBeAdded["Distance"],
+                            "elapsed_time": dataToBeAdded["ElapsedTime"],
+                            "elevation_gain": round((dataToBeAdded["ElevationH"] - dataToBeAdded["ElevationL"]), 1),
+                            "predicted_intensity": dataToBeAdded["PredictedIntensity"],
+                            "activity_name": dataToBeAdded["ActivityName"]
+                        }
+                    )
+                    print(test)
+
+                    # insert into redis database
+                    self.cr.insertJSONData(600, self.cr.createKey(activityID), test)
+                    print("Inserting data into redis DB!")
 
         return activity_data
         
