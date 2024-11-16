@@ -1,17 +1,32 @@
 from kMeansClustering import kmeans_predictor
 from website.cachingService.cachingClient import CacheClient
 from website.cachingService.databaseClient import DatabaseClient
+from stravalib import Client
 
 class CachingSystem:
     def __init__(self, cacheClient: CacheClient, dbClient: DatabaseClient):
         self.__cacheClient = cacheClient
         self.__dbClient = dbClient
 
-    def getActivityData(self, activity_ids, client, strava_athlete, activity_data):
+    def getRunningActivitiesID(self, client: Client):
+        activities = client.get_activities(None, None, 15) 
+        activity_ids = []  # get the unique ids of each activity so we can get the 'detailed' activities object via the 'get_activity()' function
+        for activity in activities:
+            rst = activity.sport_type # relaxed sport type
+            if rst.root == "Run" and len(activity_ids) <= 4:
+                print(activity.id)
+                activity_ids.append(activity.id)
+        return activity_ids
+
+    
+    def getActivityData(self, client: Client):
+        strava_athlete = client.get_athlete()
+        activity_data = []  # will be used to hold data
+        activity_ids = self.getRunningActivitiesID(client)
         # check if data entry already exists in mongoDB, if not then insert into database
         for activityID in activity_ids:
-            if self.__cacheClient.getDataFromKey(self.__cacheClient.createKey(activityID)) is None:
-                print("Cache Miss!")
+            if self.__cacheClient.getDataFromKey(self.__cacheClient.createKey(activityID)) is None and self.__dbClient.retrieveRunningData(activityID, strava_athlete.id) is None:
+                print("Data not found in both redis DB and MongoDB!")
                 activityName = client.get_activity(activityID).name
                 averageHeartRate = client.get_activity(activityID).average_heartrate
                 distance = client.get_activity(activityID).distance
