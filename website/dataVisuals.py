@@ -91,9 +91,6 @@ class dataVisualsRoutes(baseView):
             "website/static/statisticalGraphsAndCharts/heart_rate_zones.png",
             bbox_inches="tight",
         )
-        plt.show()
-
-
 
     def _setupRoutes(self):
         # setup routes
@@ -106,37 +103,19 @@ class dataVisualsRoutes(baseView):
             client = Client(access_token=access_token_file["access_token"])
             stravaAthlete = client.get_athlete()
             activityData = self.__cachingSystem.getActivityData(client)
+            HRStreamData = []
+            formattedHRStreamData = []
             for activity in activityData:
-                print(activity)
-            # retrievedData = self.__mongoDB.retrieveAthleteActivities(stravaAthleteID)
-            # activity_data = []
-            # hrData = []
-            # formmattedHRData = []
-            #
-            # # format data and append to activity data so we can show stats for each activity
-            # for doc in retrievedData:
-            #     activity_data.append(
-            #         {
-            #             "average_heart_rate": doc["AVGHR"],
-            #             "distance": doc["Distance"],
-            #             "elapsed_time": doc["ElapsedTime"],
-            #             "elevation_gain": round((doc["ElevationH"] - doc["ElevationL"]), 1),
-            #             "predicted_intensity": doc["PredictedIntensity"],
-            #             "activity_name": doc["ActivityName"]
-            #
-            #         }
-            #     )
-            #
-            # # get stream data for each activity
-            # for doc in retrievedData:
-            #     activityID = doc["ActivityID"]
-            #     streamData = client.get_activity_streams(activityID, types=["heartrate"], resolution="low")
-            #     hrData.append(streamData["heartrate"].data)
-            #
-            # # format all stream data into a singular array
-            # for stream in hrData:
-            #     formmattedHRData = formmattedHRData + stream
-            # formmattedHRData = sorted(formmattedHRData)
+                HRStreamData.append(activity["HRStream"])
+
+            # Format the HR stream data into a singular array
+            for stream in HRStreamData:
+                formattedHRStreamData = formattedHRStreamData + stream
+
+            formattedHRStreamData.sort()
+
+            self.createHRPieChart(formattedHRStreamData)
+            
             return render_template(
                 "data_visuals.html",
                 activity_data=activityData,

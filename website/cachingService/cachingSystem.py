@@ -85,7 +85,8 @@ class CachingSystem:
                             "elapsed_time": dataToBeAdded["elapsed_time"],
                             "elevation_gain": dataToBeAdded["elevation_gain"],
                             "predicted_intensity": dataToBeAdded["predicted_intensity"],
-                            "activity_name": dataToBeAdded["activity_name"]
+                            "activity_name": dataToBeAdded["activity_name"],
+                            "HRStream": dataToBeAdded["HRStream"]
                         }
                     )
                     print("Data Entry already exists on redis DB!")
