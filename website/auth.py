@@ -18,9 +18,9 @@ class authRoutes(baseView):
         self.__cachingSystem = cachingSystem
 
         # setup necessary variables
-        self.__client_id, self.__client_secret = (open("client_secrets.txt").read().strip().split(","))
-        self.__request_scope = ["read_all", "profile:read_all", "activity:read_all"]
-        self.__redirect_url = ("http://127.0.0.1:5000/authentication")
+        self.__clientID, self.__clientSecret = (open("client_secrets.txt").read().strip().split(","))
+        self.__requestScope = ["read_all", "profile:read_all", "activity:read_all"]
+        self.__redirectURL = ("http://127.0.0.1:5000/authentication")
 
     def _setupRoutes(self):
         # setup routes
@@ -30,9 +30,9 @@ class authRoutes(baseView):
 
             # creates authentication url
             url = client.authorization_url(
-                client_id=self.__client_id,
-                redirect_uri=self.__redirect_url,
-                scope=self.__request_scope,
+                client_id=self.__clientID,
+                redirect_uri=self.__redirectURL,
+                scope=self.__requestScope,
                 approval_prompt="auto",
             )
 
@@ -45,21 +45,21 @@ class authRoutes(baseView):
             client = Client()
 
             # exchanges authCode for access token in order to access athlete data
-            access_token = client.exchange_code_for_token(
-                client_id=self.__client_id,
-                client_secret=self.__client_secret,
+            accessToken = client.exchange_code_for_token(
+                client_id=self.__clientID,
+                client_secret=self.__clientSecret,
                 code=authCode,
             )
 
             # Save the token response as a JSON file
             with open(r"website/token.json", "w") as f:
-                json.dump(access_token, f)
+                json.dump(accessToken, f)
            
-            activity_data = self.__cachingSystem.getActivityData(client)
+            activityData = self.__cachingSystem.getActivityData(client)
 
             return render_template(
                 "login_results.html",
                 athlete=client.get_athlete(),
-                access_token=access_token,
-                activity_data=activity_data,
+                access_token=accessToken,
+                activity_data=activityData,
             )

@@ -24,16 +24,16 @@ class dataVisualsRoutes(baseView):
 
     def createHRPieChart(self, formmattedHRData):
         # create the figure
-        heart_rate_data = formmattedHRData 
-        zone1 = len([hr for hr in heart_rate_data if 0 <= hr <= 120])
-        zone2 = len([hr for hr in heart_rate_data if 121 <= hr <= 140])
-        zone3 = len([hr for hr in heart_rate_data if 141 <= hr <= 160])
-        zone4 = len([hr for hr in heart_rate_data if 161 <= hr <= 180])
-        zone5 = len([hr for hr in heart_rate_data if 181 <= hr <= 210])
+        heartRateData = formmattedHRData 
+        zone1 = len([hr for hr in heartRateData if 0 <= hr <= 120])
+        zone2 = len([hr for hr in heartRateData if 121 <= hr <= 140])
+        zone3 = len([hr for hr in heartRateData if 141 <= hr <= 160])
+        zone4 = len([hr for hr in heartRateData if 161 <= hr <= 180])
+        zone5 = len([hr for hr in heartRateData if 181 <= hr <= 210])
 
         # Create lists for values and labels
-        zones_value = [zone1, zone2, zone3, zone4, zone5]
-        zones_title = [
+        zonesValue = [zone1, zone2, zone3, zone4, zone5]
+        zonesTitle = [
             "Zone 1 (0-120 bpm)",
             "Zone 2 (121-140 bpm)",
             "Zone 3 (141-160 bpm)",
@@ -63,7 +63,7 @@ class dataVisualsRoutes(baseView):
         )  # Only "explode" the first slice (Zone 1)
 
         wedges, texts, autotexts = plt.pie(
-            zones_value,
+            zonesValue,
             labels=None,  # Set labels to None for the pie chart
             autopct="%1.1f%%",
             startangle=140,
@@ -74,7 +74,7 @@ class dataVisualsRoutes(baseView):
         # Adding the legend outside the pie chart
         plt.legend(
             wedges,
-            zones_title,
+            zonesTitle,
             title="Heart Rate Zones",
             loc="center left",
             bbox_to_anchor=(1, 0, 0.5, 1),
@@ -97,10 +97,10 @@ class dataVisualsRoutes(baseView):
         @self._flaskApp.route("/datavisualisation")
         def data_visualisation():
             with open(r"website/token.json", "r") as f:
-                access_token_file = json.load(f)
+                accessTokenFile = json.load(f)
 
             # Create client object again to retain session
-            client = Client(access_token=access_token_file["access_token"])
+            client = Client(access_token=accessTokenFile["access_token"])
             stravaAthlete = client.get_athlete()
             activityData = self.__cachingSystem.getActivityData(client)
             HRStreamData = []

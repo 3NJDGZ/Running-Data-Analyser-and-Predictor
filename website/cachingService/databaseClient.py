@@ -1,5 +1,4 @@
 from flask_pymongo import PyMongo
-from kMeansClustering import kmeans_predictor
 
 class DatabaseClient:
     def __init__(self, app, mongoURI):
@@ -16,8 +15,7 @@ class DatabaseClient:
         self.__databaseClient.init_app(self.__app) 
 
     def retrieveRunningData(self, activityID, athleteID):
-        cursor = self.__RDATCollection.find({"ActivityID": activityID,
-                                             "AthleteID": athleteID})
+        cursor = self.__RDATCollection.find({"ActivityID": activityID, "AthleteID": athleteID})
 
         for doc in cursor:
             return doc
@@ -45,5 +43,3 @@ class DatabaseClient:
                          "HRStream": hrStream}
 
         self.__RDATCollection.insert_one(dataToBeAdded)
-
-

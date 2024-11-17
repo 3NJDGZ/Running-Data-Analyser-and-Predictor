@@ -8,9 +8,6 @@ class CachingSystem:
         self.__cacheClient = cacheClient
         self.__dbClient = dbClient
 
-    def getHRActivityData(self, client: Client):
-        pass
-
     def getRunningActivitiesID(self, client: Client):
         activities = client.get_activities(None, None, 15) 
         activityIDs = []  # get the unique ids of each activity so we can get the 'detailed' activities object via the 'get_activity()' function
@@ -20,7 +17,6 @@ class CachingSystem:
                 print(activity.id)
                 activityIDs.append(activity.id)
         return activityIDs
-
     
     def getActivityData(self, client: Client):
         stravaAthlete = client.get_athlete()
