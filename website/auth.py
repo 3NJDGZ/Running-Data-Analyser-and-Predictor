@@ -7,13 +7,14 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 # import necessary modules
 from flask import render_template, request
 from website.baseView import baseView
+from website.cachingService import cachingSystem
 from stravalib import Client
 import json
 
 
 # wrap auth routes in a class for OOP
 class authRoutes(baseView):
-    def __init__(self, flaskApp, cachingSystem):
+    def __init__(self, flaskApp, cachingSystem: cachingSystem):
         super().__init__(flaskApp)
         self.__cachingSystem = cachingSystem
 
