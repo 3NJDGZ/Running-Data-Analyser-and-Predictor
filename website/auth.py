@@ -31,7 +31,7 @@ class authRoutes(baseView):
 
             # creates authentication url
             url = client.authorization_url(
-                client_id=self.__clientID,
+                client_id=int(self.__clientID),
                 redirect_uri=self.__redirectURL,
                 scope=self.__requestScope,
                 approval_prompt="auto",
@@ -47,7 +47,7 @@ class authRoutes(baseView):
 
             # exchanges authCode for access token in order to access athlete data
             accessToken = client.exchange_code_for_token(
-                client_id=self.__clientID,
+                client_id=int(self.__clientID),
                 client_secret=self.__clientSecret,
                 code=authCode,
             )

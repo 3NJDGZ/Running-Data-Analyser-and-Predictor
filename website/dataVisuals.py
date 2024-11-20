@@ -62,7 +62,7 @@ class dataVisualsRoutes(baseView):
             0,
         )  # Only "explode" the first slice (Zone 1)
 
-        wedges, texts, autotexts = plt.pie(
+        wedges = plt.pie(
             zonesValue,
             labels=None,  # Set labels to None for the pie chart
             autopct="%1.1f%%",
