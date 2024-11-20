@@ -33,7 +33,7 @@ class flaskAppWrapper:
     def run(self):
         self.__app.run(debug=True)
 
-flaskAppWrapper = flaskAppWrapper(mongoURI)
+flaskApp = flaskAppWrapper(mongoURI)
 
 if __name__ == "__main__":
-    flaskAppWrapper.run()
+    flaskApp.run()

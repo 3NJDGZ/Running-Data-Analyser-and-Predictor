@@ -9,7 +9,7 @@ class CachingSystem:
         self.__dbClient = dbClient
 
     def getRunningActivitiesID(self, client: Client):
-        activities = client.get_activities(None, None, 15) 
+        activities = client.get_activities() 
         activityIDs = []  # get the unique ids of each activity so we can get the 'detailed' activities object via the 'get_activity()' function
         for activity in activities:
             rst = activity.sport_type # relaxed sport type
@@ -90,32 +90,35 @@ class CachingSystem:
                 else:
                     print("Data does not exist on redis DB! ")
                     print("Getting data from mongoDB!")
+
                     dataToBeAdded = self.__dbClient.retrieveRunningData(activityID, stravaAthlete.id)
 
-                    jsonRedisData = {
-                        "average_heart_rate": dataToBeAdded["AVGHR"],
-                        "distance": dataToBeAdded["Distance"],
-                        "elapsed_time": dataToBeAdded["ElapsedTime"],
-                        "elevation_gain": round((dataToBeAdded["ElevationH"] - dataToBeAdded["ElevationL"]), 1),
-                        "predicted_intensity": dataToBeAdded["PredictedIntensity"],
-                        "activity_name": dataToBeAdded["ActivityName"],
-                        "HRStream": dataToBeAdded["HRStream"]
-                        }
-
-                    activityDataToDisplay.append(
-                        {
+                    if dataToBeAdded is not None:
+                        jsonRedisData = {
                             "average_heart_rate": dataToBeAdded["AVGHR"],
                             "distance": dataToBeAdded["Distance"],
                             "elapsed_time": dataToBeAdded["ElapsedTime"],
                             "elevation_gain": round((dataToBeAdded["ElevationH"] - dataToBeAdded["ElevationL"]), 1),
                             "predicted_intensity": dataToBeAdded["PredictedIntensity"],
-                            "activity_name": dataToBeAdded["ActivityName"]
-                        }
-                    )
+                            "activity_name": dataToBeAdded["ActivityName"],
+                            "HRStream": dataToBeAdded["HRStream"]
+                            }
 
-                    # insert into redis database
-                    self.__cacheClient.insertJSONData(600, self.__cacheClient.createKey(activityID), jsonRedisData)
-                    print("Inserting data into redis DB!")
+                        activityDataToDisplay.append(
+                            {
+                                "average_heart_rate": dataToBeAdded["AVGHR"],
+                                "distance": dataToBeAdded["Distance"],
+                                "elapsed_time": dataToBeAdded["ElapsedTime"],
+                                "elevation_gain": round((dataToBeAdded["ElevationH"] - dataToBeAdded["ElevationL"]), 1),
+                                "predicted_intensity": dataToBeAdded["PredictedIntensity"],
+                                "activity_name": dataToBeAdded["ActivityName"]
+                            }
+                        )
+                        # insert into redis database
+                        self.__cacheClient.insertJSONData(600, self.__cacheClient.createKey(activityID), jsonRedisData)
+                        print("Inserting data into redis DB!")
+                    else:
+                        print("Data retrieved is None! Error...")
 
         return activityDataToDisplay
         
