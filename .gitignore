@@ -3,3 +3,7 @@ client_secrets.txt
 __pycache__/
 venv/
 website/token.json
+dump.rdb
+test.py
+mongoURI.txt
+redisDetails.txt
