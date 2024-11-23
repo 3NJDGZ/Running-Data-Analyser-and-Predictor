@@ -11,11 +11,8 @@
         <div class="mt-4 p-5 bg-secondary text-white rounded">
             <h1><span class="text-warning">Authorization</span> Results</h1>
             <p>
-                Hi, <strong>{{ athlete.firstname }}</strong>!
+                Hi, <strong>{{ athleteName }}</strong>!
             </p>
-            <p>Your access token:</p>
-            <pre>{{ access_token|tojson(indent=2) }}</pre>
-
             <h2 class="mt-5">Recent Activities</h2>
             {% if activity_data %}
                 <div class="activities">

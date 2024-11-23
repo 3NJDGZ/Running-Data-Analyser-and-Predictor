@@ -31,7 +31,7 @@ class flaskAppWrapper:
         dataVisuals._setupRoutes()
 
     def run(self):
-        self.__app.run(debug=True)
+        self.__app.run(port=8000, debug=True)
 
 flaskApp = flaskAppWrapper(mongoURI)
 
