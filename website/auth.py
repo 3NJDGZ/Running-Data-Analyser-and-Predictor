@@ -71,5 +71,5 @@ class authRoutes(baseView):
             return render_template(
                  "login_results.html",
                  athleteName = usrFullName,
-                 activity_data=[],
+                 activity_data=activityData,
             )

@@ -1,4 +1,6 @@
 from kMeansClustering import kmeans_predictor
+from datetime import datetime
+import json
 from website.cachingService.cachingClient import CacheClient
 from website.cachingService.databaseClient import DatabaseClient
 from garminconnect import Garmin
@@ -26,7 +28,34 @@ class CachingSystem:
             activity = garminClient.get_activity(activity_id=activityID)
             if activity is not None:
                 activityName = activity["activityName"]
-                print(activityName)
+                averageHeartRate = activity["summaryDTO"]["averageHR"]
+                distanceRan = activity["summaryDTO"]["distance"]
+                elapsedTime = activity["summaryDTO"]["duration"]
+                elevationGain = activity["summaryDTO"]["elevationGain"]
+
+                # getting the date the run was ran, and formatting in YYYY-MM-DD
+                dateRan = activity["summaryDTO"]["startTimeLocal"]
+                parsedDateTime = datetime.strptime(dateRan, "%Y-%m-%dT%H:%M:%S.%f")
+                formattedDate = parsedDateTime.strftime("%Y-%m-%d")
+
+                # formatting HR stream data correctly
+                hrStreamData = garminClient.get_heart_rates(formattedDate)['heartRateValues']
+                HRStream = [hr for _, hr in hrStreamData if hr is not None]
+
+                # predict intensity of run
+                predictedIntensity = kmeans_predictor.predict(distanceRan, elevationGain, elapsedTime, averageHeartRate)
+                dataToBeAdded = {
+                            "averageHeartRate": averageHeartRate,
+                            "distanceRan": distanceRan,
+                            "elapsedTime": elapsedTime,
+                            "elevationGain": elevationGain,
+                            "predictedIntensity": predictedIntensity,
+                            "activityName": activityName,
+                            "HRStream": HRStream
+                        }
+                activityDataToDisplay.append(dataToBeAdded)
+
+
         return activityDataToDisplay
         # # check if data entry already exists in mongoDB, if not then insert into database
         # for activityID in activityIDs:
