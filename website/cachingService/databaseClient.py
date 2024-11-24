@@ -14,14 +14,14 @@ class DatabaseClient:
     def configureConnection(self):
         self.__databaseClient.init_app(self.__app) 
 
-    def retrieveRunningData(self, activityID, athleteID):
-        cursor = self.__RDATCollection.find({"ActivityID": activityID, "AthleteID": athleteID})
+    def retrieveRunningData(self, activityID):
+        cursor = self.__RDATCollection.find({"activityID": activityID})
 
         for doc in cursor:
             return doc
 
     def retrieveAthleteActivities(self, athleteID):
-        cursor = self.__RDATCollection.find({"AthleteID": athleteID})
+        cursor = self.__RDATCollection.find({"athleteID": athleteID})
         docs = []
 
         for doc in cursor:
@@ -29,17 +29,16 @@ class DatabaseClient:
 
         return docs
 
-    def insertRunningData(self, athleteID, activityID, distance, time, elevationH, elevationL, predictedIntensity, avgHR, activityName, athleteFirstName, hrStream):
-        dataToBeAdded = {"AthleteID": athleteID,
-                         "AthleteFirstName": athleteFirstName,
-                         "ActivityID": activityID,
-                         "ActivityName": activityName,
-                         "Distance": distance,
-                         "ElapsedTime": time,
-                         "ElevationH": elevationH,
-                         "ElevationL": elevationL,
-                         "PredictedIntensity": predictedIntensity,
-                         "AVGHR": avgHR,
-                         "HRStream": hrStream}
+    def insertRunningData(self, athleteID, activityID, distanceRan, elapsedTime, elevationGain, predictedIntensity, averageHR, activityName, athleteName, HRStream):
+        dataToBeAdded = {"athleteID": athleteID,
+                         "athleteName": athleteName,
+                         "activityID": activityID,
+                         "activityName": activityName,
+                         "distanceRan": distanceRan,
+                         "elapsedTime": elapsedTime,
+                         "elevationGain": elevationGain,
+                         "predictedIntensity": predictedIntensity,
+                         "averageHR": averageHR,
+                         "HRStream": HRStream}
 
         self.__RDATCollection.insert_one(dataToBeAdded)
