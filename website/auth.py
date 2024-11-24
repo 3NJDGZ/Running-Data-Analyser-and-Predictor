@@ -2,7 +2,6 @@ import sys
 import os
 
 from flask.helpers import redirect
-import garminconnect as garmin 
 from garminconnect import Garmin, GarminConnectAuthenticationError, GarminConnectConnectionError, GarminConnectTooManyRequestsError
 from garth.exc import GarthHTTPError
 
@@ -13,8 +12,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from flask import render_template, request, url_for
 from website.baseView import baseView
 from website.cachingService.cachingSystem import CachingSystem 
-from stravalib import Client
-import json
 
 # wrap auth routes in a class for OOP
 class authRoutes(baseView):
@@ -22,7 +19,7 @@ class authRoutes(baseView):
         super().__init__(flaskApp)
         self.__cachingSystem = cachingSystem
         self.__tokenstore = os.getenv("GARMINTOKENS") or "~/.garminconnect"
-        self.__garminClient = Garmin()
+        self.__garminClient = None 
        
     def _setupRoutes(self):
         # setup routes
@@ -57,19 +54,13 @@ class authRoutes(baseView):
 
         @self._flaskApp.route("/<usrFullName>")
         def logged_in(usrFullName):
-
-            # gets all the activities, and filters them by if they are a running activity
-            # activities = self.__garminClient.get_activities(0, 10)
-            #
-            # if activities is not None:
-            #     for activity in activities:
-            #         if activity['activityType']['typeId'] == 1:
-            #             print(f"Activity ID: {activity['activityId']}\n")
-            
-            activityData = self.__cachingSystem.getActivityData(garminClient=self.__garminClient)
+            if self.__garminClient is not None:
+                activityData = self.__cachingSystem.getActivityData(garminClient=self.__garminClient)
+            else:
+                activityData = []
 
             return render_template(
-                 "login_results.html",
-                 athleteName = usrFullName,
-                 activity_data=activityData,
+                    "login_results.html",
+                    athleteName = usrFullName,
+                    activity_data=activityData,
             )
