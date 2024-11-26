@@ -17,6 +17,8 @@ class flaskAppWrapper:
         # create and setup the flask app
         self.__app = create_app()  
         self.__app.config["MONGO_URI"] = (mongoURI)
+        self.__app.config["MONGO_MAX_POOL_SIZE"] = 10  # Maximum connections in the pool
+        self.__app.config["MONGO_MIN_POOL_SIZE"] = 1   # Minimum connections in the pool
         self.__cachingSystem = CachingSystem(CacheClient(), DatabaseClient(self.__app, mongoURI))
 
         self.setupRoutes()  
