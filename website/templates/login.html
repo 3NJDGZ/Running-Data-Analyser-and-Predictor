@@ -17,22 +17,31 @@
 	</div>
 	<div class="container">
 		<div class="mt-4 p-5 bg-secondary text-white rounded">
-			<h1 align="center">Login using <span class="text-warning">Strava.</span></h1>
-			<p class="text-center">
-				Authenticate using your Strava account.
-			</p>
-			<div class="text-center">
-				<button id="connectStravaBtn" type="button" class="btn btn-warning btn-lg">Connect <b>STRAVA</b></button>
-			</div>
-		</div>
+			<h1 align="center">Login using <span class="text-warning">Garmin Connect</span></h1>
+            {% if error %}
+            <div class="alert alert-danger alert-dismissible fade show">
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <strong>Danger!</strong> Invalid login details! Please try again. 
+            </div>
+            {% endif %}
+            <form action="/{{ usrFullName }}" method="POST">
+                <div class="mb-3 mt-3">
+                    <label for="email" class="form-label">Email:</label>
+                    <input type="email" class="form-control" id="email" placeholder="Enter email" name="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="pwd" class="form-label">Password:</label>
+                    <input type="password" class="form-control" id="pwd" placeholder="Enter password" name="password" required>
+                </div>
+                <div class="form-check mb-3">
+                    <label class="form-check-label">
+                    <input class="form-check-input" type="checkbox" name="remember"> Remember me
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-warning">Submit</button>
+            </form>
+        </div>
 	</div>
 </section>
-
-<script>
-    document.getElementById('connectStravaBtn').addEventListener('click', function() {
-        window.location.href = '{{ authorize_url }}';
-    });
-</script>
-
 
 {% endblock %}

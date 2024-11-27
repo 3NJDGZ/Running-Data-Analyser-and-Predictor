@@ -1,26 +1,25 @@
-import sys
-import os
-
-# Add the project root directory to sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
 # import necessary modules
 from flask import render_template
 from website.baseView import baseView
 from stravalib import Client
 from website.cachingService.cachingSystem import CachingSystem
-import json
+from website.client.GarminUserClient import GarminUserClient
 import matplotlib
-
-matplotlib.use("Agg")  # Use a non-interactive backend
 import matplotlib.pyplot as plt
+import sys
+import os
+
+# Add the project root directory to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+matplotlib.use("Agg")  # Use a non-interactive backend
 
 
 # wrap auth routes in a class for OOP
 class dataVisualsRoutes(baseView):
-    def __init__(self, flaskApp, cachingSystem: CachingSystem):
+    def __init__(self, flaskApp, cachingSystem: CachingSystem, garminUserClient: GarminUserClient ):
         super().__init__(flaskApp)
         self.__cachingSystem = cachingSystem
+        self.__garminUserClient = garminUserClient
 
     def createHRPieChart(self, formmattedHRData):
         # create the figure
@@ -96,13 +95,9 @@ class dataVisualsRoutes(baseView):
         # setup routes
         @self._flaskApp.route("/datavisualisation")
         def data_visualisation():
-            with open(r"website/token.json", "r") as f:
-                accessTokenFile = json.load(f)
 
             # Create client object again to retain session
-            client = Client(access_token=accessTokenFile["access_token"])
-            stravaAthlete = client.get_athlete()
-            activityData = self.__cachingSystem.getActivityData(client)
+            activityData = self.__cachingSystem.getActivityData(self.__garminUserClient.getGarminClient())
             HRStreamData = []
             formattedHRStreamData = []
             for activity in activityData:

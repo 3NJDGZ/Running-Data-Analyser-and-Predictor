@@ -15,12 +15,12 @@
                 <div class="activities">
                     {% for activity in activity_data %}
                         <div class="activity p-3 my-3 bg-dark rounded">
-                            <h3>Activity Name: {{ activity.activity_name }}</h3>
-                            <p><strong>Average Heart Rate:</strong> {{ activity.average_heart_rate }} bpm</p>
-                            <p><strong>Distance:</strong> {{ activity.distance }} meters</p>
-                            <p><strong>Elapsed Time:</strong> {{ activity.elapsed_time }} seconds</p>
-                            <p><strong>Elevation Gain:</strong> {{ activity.elevation_gain }} meters</p>
-                            <p><strong>Predicted Intensity:</strong> {{ activity.predicted_intensity }} </p>
+                            <h3>Activity Name: {{ activity.activityName }}</h3>
+                            <p><strong>Average Heart Rate:</strong> {{ activity.averageHR }} bpm</p>
+                            <p><strong>Distance:</strong> {{ activity.distanceRan }} meters</p>
+                            <p><strong>Elapsed Time:</strong> {{ activity.elapsedTime }} seconds</p>
+                            <p><strong>Elevation Gain:</strong> {{ activity.elevationGain }} meters</p>
+                            <p><strong>Predicted Intensity:</strong> {{ activity.predictedIntensity }} </p>
                         </div>
                     {% endfor %}
                 </div>
