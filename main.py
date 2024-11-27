@@ -6,6 +6,7 @@ from website.dataVisuals import dataVisualsRoutes
 from website.cachingService.cachingSystem import CachingSystem 
 from website.cachingService.cachingClient import CacheClient
 from website.cachingService.databaseClient import DatabaseClient
+from website.client.GarminUserClient import GarminUserClient
 
 # get mongoURI from txt file
 with open("mongoURI.txt", "r") as file:
@@ -20,14 +21,15 @@ class flaskAppWrapper:
         self.__app.config["MONGO_MAX_POOL_SIZE"] = 10  # Maximum connections in the pool
         self.__app.config["MONGO_MIN_POOL_SIZE"] = 1   # Minimum connections in the pool
         self.__cachingSystem = CachingSystem(CacheClient(), DatabaseClient(self.__app, mongoURI))
+        self.__garminUserClient = GarminUserClient()
 
         self.setupRoutes()  
         
     def setupRoutes(self):
         # create the different routes, and call their protected methods which are overridden from baseView abstract super class
         views = viewRoutes(self.__app)
-        auth = authRoutes(self.__app, self.__cachingSystem)
-        dataVisuals = dataVisualsRoutes(self.__app, self.__cachingSystem)
+        auth = authRoutes(self.__app, self.__cachingSystem, self.__garminUserClient)
+        dataVisuals = dataVisualsRoutes(self.__app, self.__cachingSystem, self.__garminUserClient)
         views._setupRoutes()
         auth._setupRoutes()
         dataVisuals._setupRoutes()

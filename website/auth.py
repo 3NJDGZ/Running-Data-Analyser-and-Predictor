@@ -4,22 +4,20 @@ import os
 from flask.helpers import redirect
 from garminconnect import Garmin, GarminConnectAuthenticationError, GarminConnectConnectionError, GarminConnectTooManyRequestsError
 from garth.exc import GarthHTTPError
-
-# Add the project root directory to sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
-# import necessary modules
+from website.client.GarminUserClient import GarminUserClient
 from flask import render_template, request, url_for
 from website.baseView import baseView
 from website.cachingService.cachingSystem import CachingSystem 
 
-# wrap auth routes in a class for OOP
+# Add the project root directory to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 class authRoutes(baseView):
-    def __init__(self, flaskApp, cachingSystem: CachingSystem):
+    def __init__(self, flaskApp, cachingSystem: CachingSystem, garminUserClient: GarminUserClient):
         super().__init__(flaskApp)
         self.__cachingSystem = cachingSystem
         self.__tokenstore = os.getenv("GARMINTOKENS") or "~/.garminconnect"
-        self.__garminClient = None 
+        self.__garminUserClient = garminUserClient
        
     def _setupRoutes(self):
         # setup routes
@@ -34,12 +32,9 @@ class authRoutes(baseView):
                 remember = request.form.get("remember")
                 if remember is None:
                     remember = "off"
-                print(f"Email: {email}, Password: {pwd}, Remember: {remember}")
                 try:
-                    self.__garminClient = Garmin(email=email, password=pwd)
-                    self.__garminClient.login()
-                    self.__garminClient.garth.dump(self.__tokenstore)
-                    usrFullName = self.__garminClient.get_full_name()
+                    self.__garminUserClient.loginAndCreateClient(email, pwd)
+                    usrFullName = self.__garminUserClient.getGarminClient().get_full_name()
                     return redirect(url_for("logged_in", usrFullName = usrFullName)) 
                 except (GarminConnectAuthenticationError, 
                         GarminConnectConnectionError, 
@@ -54,8 +49,8 @@ class authRoutes(baseView):
 
         @self._flaskApp.route("/<usrFullName>")
         def logged_in(usrFullName):
-            if self.__garminClient is not None:
-                activityData = self.__cachingSystem.getActivityData(garminClient=self.__garminClient)
+            if self.__garminUserClient.getGarminClient() is not None:
+                activityData = self.__cachingSystem.getActivityData(garminClient=self.__garminUserClient.getGarminClient())
             else:
                 activityData = []
 
