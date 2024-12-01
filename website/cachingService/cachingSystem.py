@@ -10,8 +10,8 @@ class CachingSystem:
         self.__dbClient = dbClient
 
     def getRunningActivitiesID(self, garminClient: Garmin):
-        activityIDs = []  # get the unique ids of each activity so we can get the 'detailed' activities object via the 'get_activity()' function
-        activities = garminClient.get_activities(0, 10)
+        activityIDs = []  
+        activities = garminClient.get_activities()
 
         if activities is not None:
             for activity in activities:
@@ -56,6 +56,7 @@ class CachingSystem:
                         "elapsedTime": elapsedTime,
                         "predictedIntensity": predictedIntensity,
                         "averageHR": averageHR,
+                        "elevationGain": elevationGain,
                         "HRStream": HRStream
                     }
 
